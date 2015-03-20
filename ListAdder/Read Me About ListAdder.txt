@@ -1,0 +1,74 @@
+Read Me About ListAdder
+=================
+1.1
+
+This samples demonstrates the technique of thread confinement using NSOperation.  It was written to support Technote TN2109 "Simple and Reliable Threading with NSOperation".
+
+ListAdder requires iOS 7.0, although the underlying technique will work on all versions of iOS and on OS X 10.5 and later.
+
+Packing List
+------------
+The sample contains the following items:
+
+o Read Me About ListAdder.txt -- This file.
+
+o ListAdder.xcodeproj -- An Xcode project for the sample.
+
+o main.m, Info.plist, "Default Images", Icons, and AppDelegate.{h,m} -- Uninteresting boilerplate code.
+
+o Main.storyboard -- The storyboard for the app.
+
+o ListAdderViewController.{h,m} -- A view controller for the main view.
+
+o AdderOperation.{h,m} -- The NSOperation subclass that does the asynchronous add.  Together with ListAdderViewController this represents the interesting part of the code.
+
+o NumberPickerController.{h,m} -- A view controller that lets the user choose a number to add to the list.
+
+o OptionsController.{h,m} -- A view controller that lets the user change various debugging options.
+
+Building the Sample
+-------------------
+The sample was built using Xcode 6.0 on OS X 10.9.4 with the iOS 8.0 SDK.  You should be able to just open the project and choose Build from the Build menu.
+
+Using the Sample
+----------------
+Upon running the sample you are presented with a list of numbers.  You can tap the plus button to add a number to the list.  You can tap one of the minus buttons to remove items from the list.  Whenever you change the list the application kicks off an async operation to update the total being displayed.  This operation is artifically slowed down to help test various edge cases.
+
+You can tap the Minimum button to set the list of items to a single entry or, if the list is already a single entry, tap the Defaults button to set it back to the default list.  This is useful when testing various edge cases.  You can also tap the Options button to enable various testing options:
+
+o "Retain, Not Copy" -- If you enable this option AdderOperation retains, rather than copying, the incoming list of numbers.  If you do this and then tap the Defaults/Minimum button rapidly, the application will crash as the main thread mutates the list that's being operated on by the thread running the AdderOperation.
+
+o "Allow Stale" -- If you enable this option ListAdderViewController does not check whether a completed operation is still relevant, meaning that, if you make changes in rapid succession, you see stale results in the user interface.
+
+o "Use Threads Directly" -- If you enable this option ListAdderViewController will use a thread rather than an NSOperation to update the total.  This allows us the code to demonstrate the various problems that crop up when using threads rather than operations.
+
+o "Apply Results From Thread" -- If you enable this option ListAdderViewController will commit the results directly from its secondary thread rather than bouncing back to the main thread.  Needless to say, that generally ends badly.
+
+o "Add Faster" -- If you enable this the add operation runs faster, which is nice if you're testing the sample a lot.
+
+IMPORTANT: Because this sample was written to support Technote TN2109, it demonstrates various techniques that are incorrect.  Such code is either never executed (and commented as such) or executed conditionally based on the debugging options listed above.  If you enable these options, the code will do the wrong thing and, beyond that, it may crash.  Specifically, in the Debug build it may trip an assert, while in the Release build it's likely to crash in more subtle ways.
+
+How It Works
+------------
+This sample was created to support TN2109 "Simple and Reliable Threading with NSOperation".  You should read that technote to learn more about this code.
+
+Caveats
+-------
+Some techniques shown by the sample were deliberately not updated because that would put the code too far out of sync with the snippets in TN2109.  For example, the sample still uses -performSelectorOnMainThread:xxx rather than adding block operations on +[NSOperation mainQueue].
+
+Credits and Version History
+---------------------------
+If you find any problems with this sample, please file a bug against it.
+
+<http://developer.apple.com/bugreporter/>
+
+1.0 (Aug 2010) was the first shipping version.
+
+1.1 (Sep 2014) is an update to adopt modern coding techniques (storyboards, modern Objective-C, ARC, and so on).  It does not change the fundamentals outlined in TN2109.
+
+Share and Enjoy
+
+Apple Developer Technical Support
+Core OS/Hardware
+
+17 Sep 2014
